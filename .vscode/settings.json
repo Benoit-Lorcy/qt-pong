@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "qtwidgets": "cpp",
+        "string_view": "cpp",
+        "string": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp"
+    }
+}
