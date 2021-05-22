@@ -6,28 +6,31 @@
 #include "constants.h"
 #include "player.h"
 
-class Scene : public QGraphicsScene
-{
+class Scene : public QGraphicsScene {
     Q_OBJECT
-public:
+   public:
     Scene(QObject* parents = 0);
     ~Scene() {}
     void drawBackground(QPainter* painter, const QRectF& rect) override;
     void keyPressEvent(QKeyEvent* event);
     void keyReleaseEvent(QKeyEvent* event);
     void setMiddleLine();
-    void setText(QGraphicsTextItem* text, PlayerSide side = PlayerSide::Default);
+    void setText(QGraphicsTextItem* text,
+                 PlayerSide side = PlayerSide::Default);
     void checkWin();
     void printInfo(QString text);
     void reset();
+
     Ball* getBall() { return this->ball; }
     Player* getP1() { return this->p1; }
     Player* getP2() { return this->p2; }
 
-    public slots : void update();
+   public slots:
+    void update();
     void addPoint(PlayerSide side);
+    void sceneSettings(qreal textSize, qreal scoreToWin);
 
-private:
+   private:
     bool pause, end;
     QGraphicsTextItem *score1, *score2;
     QGraphicsTextItem* info;

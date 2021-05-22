@@ -4,22 +4,24 @@
 #include <QtWidgets>
 
 #include "constants.h"
-class ConfigWindow : public QWidget
-{
+class ConfigWindow : public QWidget {
     Q_OBJECT
 
-public:
+   public:
     ConfigWindow();
     ~ConfigWindow() {}
-    //QGroupBox* BuildGroupBoxControle();
+    // QGroupBox* BuildGroupBoxControle();
 
-signals:
-    void ballSettings(qreal ballw, qreal ballh, qreal baseSpeed, qreal incrementSpeed);
-    void paddlesSettings(qreal paddlew, qreal paddleh, qreal distance, qreal vitesse);
-    void controlesSettings(qreal textSize, qreal scoreToWin);
-    //void ControlesSettings(qreal baseSpeed, qreal incrementSpeed, qreal ballw, qreal ballh);
+   signals:
+    void ballSettings(qreal ballw, qreal ballh, qreal baseSpeed,
+                      qreal incrementSpeed);
+    void paddlesSettings(qreal paddlew, qreal paddleh, qreal distance,
+                         qreal vitesse);
+    void sceneSettings(qreal textSize, qreal scoreToWin);
+    // void ControlesSettings(qreal baseSpeed, qreal incrementSpeed, qreal
+    // ballw, qreal ballh);
 
-private:
+   private:
     QGridLayout *grid;
     QWidget *widget_principal;
     QGroupBox *createBalleGroup();
@@ -33,7 +35,8 @@ private:
 
     void submitChanges();
 
-    void addCustomSlider(QString name, QGridLayout *grid, int current, int min, int max, QVector<QSlider *> &ballGroup);
+    void addCustomSlider(QString name, QGridLayout *grid, int current, int min,
+                         int max, QVector<QSlider *> &ballGroup);
 };
 
 #endif

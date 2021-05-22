@@ -1,7 +1,6 @@
 #include "scene.h"
 
-Scene::Scene(QObject* parent) : QGraphicsScene(parent)
-{
+Scene::Scene(QObject* parent) : QGraphicsScene(parent) {
     p1 = new Player(PlayerSide::Left);
     p2 = new Player(PlayerSide::Right);
     score1 = new QGraphicsTextItem();
@@ -37,16 +36,15 @@ Scene::Scene(QObject* parent) : QGraphicsScene(parent)
     this->addItem(info);
 
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    connect(ball, SIGNAL(addPoint(PlayerSide)), this, SLOT(addPoint(PlayerSide)));
+    connect(ball, SIGNAL(addPoint(PlayerSide)), this,
+            SLOT(addPoint(PlayerSide)));
 
     timer->start(30);
     ball->launch();
 }
 
-void Scene::update()
-{
-    if (pause)
-    {
+void Scene::update() {
+    if (pause) {
         return;
     }
 
@@ -56,18 +54,14 @@ void Scene::update()
     p2->move(boardWidth, boardHeight);
 }
 
-void Scene::addPoint(PlayerSide side)
-{
-    if (side == PlayerSide::Left)
-    {
+void Scene::addPoint(PlayerSide side) {
+    if (side == PlayerSide::Left) {
         p1->setScore(p1->getScore() + 1);
         score1->setPlainText(QString::number(p1->getScore()));
         checkWin();
         ball->reset();
         ball->launch(PlayerSide::Right);
-    }
-    else if (side == PlayerSide::Right)
-    {
+    } else if (side == PlayerSide::Right) {
         p2->setScore(p2->getScore() + 1);
         score2->setPlainText(QString::number(p2->getScore()));
         checkWin();
@@ -76,89 +70,63 @@ void Scene::addPoint(PlayerSide side)
     }
 }
 
-void Scene::keyPressEvent(QKeyEvent* event)
-{
+void Scene::keyPressEvent(QKeyEvent* event) {
     int key = event->key();
-    //qDebug() << event->key();
+    // qDebug() << event->key();
 
-    if (key == keyPause)
-    {
-        if (end)
-        {
+    if (key == keyPause) {
+        if (end) {
             end = !end;
             reset();
             return;
         }
 
         pause = !pause;
-        if (pause)
-        {
+        if (pause) {
             printInfo("Pause");
-        }
-        else
-        {
+        } else {
             info->hide();
         }
     }
 
-    if (key == keyP1Up)
-    {
+    if (key == keyP1Up) {
         p1->setUpPressed(true);
-    }
-    else if (key == keyP1Down)
-    {
+    } else if (key == keyP1Down) {
         p1->setDownPressed(true);
-    }
-    else if (key == keyP2Up)
-    {
+    } else if (key == keyP2Up) {
         p2->setUpPressed(true);
-    }
-    else if (key == keyP2Down)
-    {
+    } else if (key == keyP2Down) {
         p2->setDownPressed(true);
     }
 }
 
-void Scene::keyReleaseEvent(QKeyEvent* event)
-{
+void Scene::keyReleaseEvent(QKeyEvent* event) {
     int key = event->key();
-    if (key == keyP1Up)
-    {
+    if (key == keyP1Up) {
         p1->setUpPressed(false);
-    }
-    else if (key == keyP1Down)
-    {
+    } else if (key == keyP1Down) {
         p1->setDownPressed(false);
-    }
-    else if (key == keyP2Up)
-    {
+    } else if (key == keyP2Up) {
         p2->setUpPressed(false);
-    }
-    else if (key == keyP2Down)
-    {
+    } else if (key == keyP2Down) {
         p2->setDownPressed(false);
     }
 }
 
-void Scene::setText(QGraphicsTextItem* text, PlayerSide side)
-{
-    if (side != PlayerSide::Default)
-    {
+void Scene::setText(QGraphicsTextItem* text, PlayerSide side) {
+    if (side != PlayerSide::Default) {
         text->setPlainText("0");
         text->setScale(textSize);
         text->setDefaultTextColor(Qt::white);
         QRectF rect = text->boundingRect();
-        if (side == PlayerSide::Left)
-        {
-            text->setPos(textSize * (-rect.width() / 2) - (boardWidth / 4), textSize * (-rect.height() / 2) - (boardHeight / 4));
+        if (side == PlayerSide::Left) {
+            text->setPos(textSize * (-rect.width() / 2) - (boardWidth / 4),
+                         textSize * (-rect.height() / 2) - (boardHeight / 4));
+        } else if (side == PlayerSide::Right) {
+            text->setPos(textSize * (-rect.width() / 2) + (boardWidth / 4),
+                         textSize * (-rect.height() / 2) - (boardHeight / 4));
         }
-        else if (side == PlayerSide::Right)
-        {
-            text->setPos(textSize * (-rect.width() / 2) + (boardWidth / 4), textSize * (-rect.height() / 2) - (boardHeight / 4));
-        }
-    }
-    else
-    {
+    } else {
         text->setDefaultTextColor(Qt::gray);
         textSize = textSize / 2;
         text->setScale(textSize);
@@ -166,56 +134,52 @@ void Scene::setText(QGraphicsTextItem* text, PlayerSide side)
 
         QRectF rect = text->boundingRect();
 
-        text->setPos(textSize * (-rect.width() / 2), textSize * (-rect.height() / 2));
+        text->setPos(textSize * (-rect.width() / 2),
+                     textSize * (-rect.height() / 2));
     }
 }
 
-void Scene::setMiddleLine()
-{
+void Scene::setMiddleLine() {
     QPen pen;
 
     pen.setStyle(Qt::DashLine);
     pen.setWidth(3);
     pen.setBrush(Qt::white);
 
-    middleLine = new QGraphicsLineItem(3 / 2, -boardHeight / 2, 0, boardHeight / 2 - 5);
+    middleLine =
+        new QGraphicsLineItem(3 / 2, -boardHeight / 2, 0, boardHeight / 2 - 5);
     middleLine->setPen(pen);
 }
 
-void Scene::drawBackground(QPainter* painter, const QRectF& rect)
-{
+void Scene::drawBackground(QPainter* painter, const QRectF& rect) {
     painter->setBrush((QBrush)Qt::green);
     painter->drawRect(rect);
 
-    /*QRectF source(0.0, 0.0, background_image.width(), background_image.height());
-    painter->drawPixmap(rect, background_image, source);*/
+    /*QRectF source(0.0, 0.0, background_image.width(),
+    background_image.height()); painter->drawPixmap(rect, background_image,
+    source);*/
 }
 
-void Scene::checkWin()
-{
-    if (p1->getScore() == scoreToWin)
-    {
+void Scene::checkWin() {
+    if (p1->getScore() == scoreToWin) {
         printInfo("Player 1 wins");
         end = true;
-    }
-    else if (p2->getScore() == scoreToWin)
-    {
+    } else if (p2->getScore() == scoreToWin) {
         printInfo("Player 2 wins");
         end = true;
     }
 }
 
-void Scene::printInfo(QString text)
-{
+void Scene::printInfo(QString text) {
     pause = true;
     info->setPlainText(text);
     QRectF rect = info->boundingRect();
-    info->setPos(textSize * (-rect.width() / 2), textSize * (-rect.height() / 2));
+    info->setPos(textSize * (-rect.width() / 2),
+                 textSize * (-rect.height() / 2));
     info->show();
 }
 
-void Scene::reset()
-{
+void Scene::reset() {
     ball->reset();
     p1->reset(boardWidth, boardHeight);
     p2->reset(boardWidth, boardHeight);
@@ -223,3 +187,15 @@ void Scene::reset()
     score2->setPlainText("0");
     printInfo("Press space to start !");
 }
+
+void Scene::sceneSettings(qreal textSize, qreal scoreToWin) {
+    // qDebug() << textSize << scoreToWin;
+
+    this->textSize = textSize;
+    this->scoreToWin = scoreToWin;
+
+    setText(score1, PlayerSide::Left);
+    setText(score2, PlayerSide::Right);
+    setText(info);
+}
+
