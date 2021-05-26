@@ -1,4 +1,4 @@
-#include "fenetrePrincipale.h"
+#include "include/fenetrePrincipale.h"
 
 FenetrePrincipale::FenetrePrincipale() : QMainWindow() {
     // le widget dans lequel tout s'affiche
@@ -11,7 +11,7 @@ FenetrePrincipale::FenetrePrincipale() : QMainWindow() {
 
     mainScene = new Scene(this);
     mainView = new View(mainScene, this);
-
+    fullScreen = false;
     // menuConfig = menuBar()->addMenu(tr("&Config"));
     // menuConfig->addAction(show_config_window);
     // this->setAttribute(Qt::WA_DeleteOnClose);
@@ -28,9 +28,24 @@ FenetrePrincipale::FenetrePrincipale() : QMainWindow() {
             mainScene->getP2(),
             SLOT(paddlesSettings(qreal, qreal, qreal, qreal)));
 
-    connect(conf, SIGNAL(sceneSettings(qreal, qreal)), mainScene,
-            SLOT(sceneSettings(qreal, qreal)));
+    connect(conf, SIGNAL(sceneSettings(qreal, qreal, qreal)), mainScene,
+            SLOT(sceneSettings(qreal, qreal, qreal)));
+
+    connect(mainScene, SIGNAL(FullScreenUpdate()), this,
+            SLOT(FullScreenUpdate()));
     this->setCentralWidget(mainView);
+    // this->showFullScreen();
+}
+
+// permet de mettre la fenetre en grand écrant quand on reçoit le signal de la
+// scène
+void FenetrePrincipale::FullScreenUpdate() {
+    fullScreen = !fullScreen;
+    if (fullScreen) {
+        this->showFullScreen();
+    } else {
+        this->showNormal();
+    }
 }
 
 FenetrePrincipale::~FenetrePrincipale() {}

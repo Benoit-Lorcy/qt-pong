@@ -2,12 +2,11 @@
 #define VIEW_H
 #include <QtWidgets>
 
-#include "scene.h"
+#include "include/scene.h"
 
-class View : public QGraphicsView
-{
+class View : public QGraphicsView {
     Q_OBJECT
-public:
+   public:
     View(Scene *scene, QWidget *parent = nullptr);
     Scene *scene;
     ~View() {}

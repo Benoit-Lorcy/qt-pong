@@ -2,9 +2,9 @@
 #define SCENE_H
 #include <QtWidgets>
 
-#include "ball.h"
-#include "constants.h"
-#include "player.h"
+#include "include/ball.h"
+#include "include/constants.h"
+#include "include/player.h"
 
 class Scene : public QGraphicsScene {
     Q_OBJECT
@@ -25,10 +25,13 @@ class Scene : public QGraphicsScene {
     Player* getP1() { return this->p1; }
     Player* getP2() { return this->p2; }
 
+   signals:
+    void FullScreenUpdate();
+
    public slots:
     void update();
     void addPoint(PlayerSide side);
-    void sceneSettings(qreal textSize, qreal scoreToWin);
+    void sceneSettings(qreal textSize, qreal scoreToWin, qreal volume);
 
    private:
     bool pause, end;
@@ -40,9 +43,10 @@ class Scene : public QGraphicsScene {
     QPixmap background_image;
     QTimer* timer;
     int boardWidth, boardHeight;
-    int keyPause, keyP1Up, keyP1Down, keyP2Up, keyP2Down;
+    int keyFullscreen, keyPause, keyP1Up, keyP1Down, keyP2Up, keyP2Down;
     int scoreToWin;
     qreal textSize;
+    QSoundEffect winnerSound, pointSound;
 };
 
 #endif

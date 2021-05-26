@@ -1,17 +1,21 @@
-#include "scene.h"
+#include "include/scene.h"
 
 Scene::Scene(QObject* parent) : QGraphicsScene(parent) {
+    // initialistion des variables qui n'ont pas pour but d'être changées
     p1 = new Player(PlayerSide::Left);
     p2 = new Player(PlayerSide::Right);
     score1 = new QGraphicsTextItem();
     score2 = new QGraphicsTextItem();
     ball = new Ball();
-    background_image = QPixmap("chat.jpg");
+    // background_image = QPixmap("chat.jpg");
+    pointSound.setSource(QUrl::fromLocalFile("assets/pointScored.wav"));
+    winnerSound.setSource(QUrl::fromLocalFile("assets/winner.wav"));
     timer = new QTimer(this);
     info = new QGraphicsTextItem();
     pause = true;
     end = false;
 
+    // initialisation variables avec constants.h
     boardWidth = BOARD_WIDTH;
     boardHeight = BOARD_HEIGHT;
     keyPause = KEY_PAUSE;
@@ -19,14 +23,17 @@ Scene::Scene(QObject* parent) : QGraphicsScene(parent) {
     keyP1Down = KEY_P1_DOWN;
     keyP2Up = KEY_P2_UP;
     keyP2Down = KEY_P2_DOWN;
+    keyFullscreen = KEY_FULL_SCREEN;
     textSize = TEXT_SIZE;
     scoreToWin = SCORE_TO_WIN;
 
+    // initialisation des textes et de la ligne centrale
     setText(info, PlayerSide::Default);
     setText(score1, PlayerSide::Left);
     setText(score2, PlayerSide::Right);
     setMiddleLine();
 
+    // on met nos différents elements dans la scène
     this->addItem(score1);
     this->addItem(score2);
     this->addItem(middleLine);
@@ -35,14 +42,17 @@ Scene::Scene(QObject* parent) : QGraphicsScene(parent) {
     this->addItem(ball);
     this->addItem(info);
 
+    // initialisation des connect pour l'update et l'addition des points
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     connect(ball, SIGNAL(addPoint(PlayerSide)), this,
             SLOT(addPoint(PlayerSide)));
 
+    // la partie commence
     timer->start(30);
     ball->launch();
 }
 
+// Permet de mettre a jour le plateau de jeux à chaque tick
 void Scene::update() {
     if (pause) {
         return;
@@ -54,6 +64,8 @@ void Scene::update() {
     p2->move(boardWidth, boardHeight);
 }
 
+// Permet d'ajouter un point aux jouers, de relancer la balle et de vérifier si
+// un joueur a gagné
 void Scene::addPoint(PlayerSide side) {
     if (side == PlayerSide::Left) {
         p1->setScore(p1->getScore() + 1);
@@ -70,10 +82,11 @@ void Scene::addPoint(PlayerSide side) {
     }
 }
 
+// Permet de savoir si une touche est préssée
 void Scene::keyPressEvent(QKeyEvent* event) {
     int key = event->key();
-    // qDebug() << event->key();
 
+    // permet de mettre le jeux en pause ou d'arrêter l'état de fin du jeu
     if (key == keyPause) {
         if (end) {
             end = !end;
@@ -89,6 +102,7 @@ void Scene::keyPressEvent(QKeyEvent* event) {
         }
     }
 
+    // combinée a la méthode suivante, permet d'avoir des paddles fluides
     if (key == keyP1Up) {
         p1->setUpPressed(true);
     } else if (key == keyP1Down) {
@@ -98,10 +112,17 @@ void Scene::keyPressEvent(QKeyEvent* event) {
     } else if (key == keyP2Down) {
         p2->setDownPressed(true);
     }
+
+    if (key == keyFullscreen) {
+        emit FullScreenUpdate();
+    }
 }
 
+// Permet de savoir si une touche est relachée
 void Scene::keyReleaseEvent(QKeyEvent* event) {
     int key = event->key();
+
+    // combinée a la méthode si dessus, permet d'avoir des paddles fluides
     if (key == keyP1Up) {
         p1->setUpPressed(false);
     } else if (key == keyP1Down) {
@@ -113,9 +134,12 @@ void Scene::keyReleaseEvent(QKeyEvent* event) {
     }
 }
 
+// permet d'initiliser un texte et de la placer sur le plateau
 void Scene::setText(QGraphicsTextItem* text, PlayerSide side) {
     if (side != PlayerSide::Default) {
-        text->setPlainText("0");
+        if (text->toPlainText() == "") {
+            text->setPlainText("0");
+        }
         text->setScale(textSize);
         text->setDefaultTextColor(Qt::white);
         QRectF rect = text->boundingRect();
@@ -130,7 +154,7 @@ void Scene::setText(QGraphicsTextItem* text, PlayerSide side) {
         text->setDefaultTextColor(Qt::gray);
         textSize = textSize / 2;
         text->setScale(textSize);
-        text->setPlainText("Press space to start !");
+        text->setPlainText("Press space to start !");  // Press space to start !
 
         QRectF rect = text->boundingRect();
 
@@ -139,6 +163,7 @@ void Scene::setText(QGraphicsTextItem* text, PlayerSide side) {
     }
 }
 
+// On met en place la ligne du milieu
 void Scene::setMiddleLine() {
     QPen pen;
 
@@ -151,8 +176,11 @@ void Scene::setMiddleLine() {
     middleLine->setPen(pen);
 }
 
+// Permet de changer le fond, néamoins cette methode de fonctionne pas
+// correctement Si le code est décomenté des lignes noires sont formés sur
+// l'image après le passage de la balle
 void Scene::drawBackground(QPainter* painter, const QRectF& rect) {
-    painter->setBrush((QBrush)Qt::green);
+    painter->setBrush((QBrush)Qt::black);
     painter->drawRect(rect);
 
     /*QRectF source(0.0, 0.0, background_image.width(),
@@ -160,16 +188,22 @@ void Scene::drawBackground(QPainter* painter, const QRectF& rect) {
     source);*/
 }
 
+// On regarde si un joueur a ganger, si qqn a gagner, c'est la fin de la partie
 void Scene::checkWin() {
-    if (p1->getScore() == scoreToWin) {
-        printInfo("Player 1 wins");
+    if (p1->getScore() >= scoreToWin) {
+        winnerSound.play();
+        printInfo("Player 1 wins");  // Player 1 wins
         end = true;
-    } else if (p2->getScore() == scoreToWin) {
-        printInfo("Player 2 wins");
+    } else if (p2->getScore() >= scoreToWin) {
+        winnerSound.play();
+        printInfo("Player 2 wins");  // Player 2 wins
         end = true;
+    } else {
+        pointSound.play();
     }
 }
 
+// Permet d'afficher le texte central centré selon la longueur du texte
 void Scene::printInfo(QString text) {
     pause = true;
     info->setPlainText(text);
@@ -179,8 +213,8 @@ void Scene::printInfo(QString text) {
     info->show();
 }
 
+// Permet de remettre à 0 les attribus de classes pour remettre a 0 la partie
 void Scene::reset() {
-    ball->reset();
     p1->reset(boardWidth, boardHeight);
     p2->reset(boardWidth, boardHeight);
     score1->setPlainText("0");
@@ -188,14 +222,17 @@ void Scene::reset() {
     printInfo("Press space to start !");
 }
 
-void Scene::sceneSettings(qreal textSize, qreal scoreToWin) {
-    // qDebug() << textSize << scoreToWin;
-
+// Permet d'actualiser la scene avec les nouveau paramètres de la fenetre
+// settings
+void Scene::sceneSettings(qreal textSize, qreal scoreToWin, qreal volume) {
     this->textSize = textSize;
     this->scoreToWin = scoreToWin;
 
     setText(score1, PlayerSide::Left);
     setText(score2, PlayerSide::Right);
     setText(info);
-}
 
+    ball->getSound().setVolume(volume * 0.01);
+    winnerSound.setVolume(volume * 0.01);
+    pointSound.setVolume(volume * 0.01);
+}

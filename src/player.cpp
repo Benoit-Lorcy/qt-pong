@@ -1,4 +1,4 @@
-#include "player.h"
+#include "include/player.h"
 
 Player::Player(PlayerSide initside, QGraphicsItem *parent)
     : QGraphicsRectItem(parent), side(initside) {
@@ -14,7 +14,9 @@ Player::Player(PlayerSide initside, QGraphicsItem *parent)
     reset(BOARD_WIDTH, BOARD_HEIGHT);
 }
 
+// Permet d'update la position des paddles à chaque tick
 void Player::move(int boardWidth, int boardHeight) {
+    Q_UNUSED(boardWidth);
     // qDebug() << "alert";
     if (goUp && goDown) {
         return;
@@ -25,7 +27,9 @@ void Player::move(int boardWidth, int boardHeight) {
     }
 }
 
+// Permet de mettre ou remettre les paddles au milieu du terrain
 void Player::reset(int boardWidth, int boardHeight) {
+    Q_UNUSED(boardHeight);
     score = 0;
     if (side == PlayerSide::Left) {
         this->setRect(-(boardWidth / 2) - (paddlew / 2) + (paddleDistance),
@@ -36,6 +40,8 @@ void Player::reset(int boardWidth, int boardHeight) {
     }
 }
 
+// Permet d'actualiser les paddles avec les nouveau paramètres de la fenetre
+// settings
 void Player::paddlesSettings(qreal paddlew, qreal paddleh, qreal distance,
                              qreal vitesse) {
     this->paddlew = paddlew;

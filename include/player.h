@@ -3,19 +3,13 @@
 
 #include <QtWidgets>
 
-#include "constants.h"
+#include "include/constants.h"
 
-enum class PlayerSide
-{
-    Left = 0,
-    Right = 1,
-    Default = 2
-};
+enum class PlayerSide { Left = 0, Right = 1, Default = 2 };
 
-class Player : public QObject, public QGraphicsRectItem
-{
+class Player : public QObject, public QGraphicsRectItem {
     Q_OBJECT
-public:
+   public:
     Player(PlayerSide side, QGraphicsItem *parent = nullptr);
     ~Player() {}
     void move(int boardWidth, int boardHeight);
@@ -25,10 +19,11 @@ public:
     void setScore(int newScore) { score = newScore; }
     void reset(int boardWidth, int boardHeight);
 
-public slots:
-    void paddlesSettings(qreal paddlew, qreal paddleh, qreal distance, qreal vitesse);
+   public slots:
+    void paddlesSettings(qreal paddlew, qreal paddleh, qreal distance,
+                         qreal vitesse);
 
-private:
+   private:
     bool goUp, goDown;
     int score;
     int speed;

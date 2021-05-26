@@ -1,34 +1,38 @@
 #ifndef BALL_H
 #define BALL_H
 
+#include <QSoundEffect>
 #include <QtWidgets>
 
-#include "constants.h"
-#include "player.h"
+#include "include/constants.h"
+#include "include/player.h"
 
-class Ball : public QObject, public QGraphicsRectItem
-{
+class Ball : public QObject, public QGraphicsRectItem {
     Q_OBJECT
-public:
+   public:
     Ball();
     ~Ball() {}
     void launch(PlayerSide side = PlayerSide::Default);
     void collision(Player* p1, Player* p2, qreal boardWidth, qreal boardHeight);
     void reset();
     void move();
+    QSoundEffect& getSound() { return bounceSound; }
 
-signals:
+   signals:
     void addPoint(PlayerSide side);
 
-public slots:
-    void ballSettings(qreal ballw, qreal ballh, qreal baseSpeed, qreal incrementSpeed);
+   public slots:
+    void ballSettings(qreal ballw, qreal ballh, qreal baseSpeed,
+                      qreal incrementSpeed);
 
-private:
+   private:
     qreal vx, vy;
     qreal baseSpeed;
     qreal incrementSpeed;
+    qreal currentSpeed;
     qreal ballw;
     qreal ballh;
+    QSoundEffect bounceSound;
 };
 
 #endif
